@@ -30,20 +30,19 @@ export default function Login() {
     mutationFn: async (data: LoginCredentials) => {
       return apiRequest<{ user: User; token: string }>("POST", "/api/auth/login", data);
     },
-    onSuccess: (data) => {
-      login(data.user, data.token);
-      toast({
-        title: "Welcome back!",
-        description: `Logged in as ${data.user.name}`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
-    },
+   onSuccess: (data) => {
+  // Save token persistently
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  login(data.user, data.token);
+
+  toast({
+    title: "Welcome back!",
+    description: `Logged in as ${data.user.name}`,
+  });
+},
+
   });
 
   const onSubmit = (data: LoginCredentials) => {
