@@ -1,4 +1,3 @@
-import { db } from "./db";
 import { eq, desc, sql, and } from "drizzle-orm";
 import {
   users,
@@ -114,7 +113,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVolunteers(): Promise<User[]> {
-    return await db.select().from(users).where(eq(users.role, 'VOLUNTEER'));
+    return await db.select().from(users).where(eq(users.role, "VOLUNTEER"));
   }
 
   // Campaign operations
@@ -140,7 +139,7 @@ export class DatabaseStorage implements IStorage {
       .groupBy(campaigns.id)
       .orderBy(desc(campaigns.createdAt));
 
-    return campaignsWithStats.map(c => ({
+    return campaignsWithStats.map((c) => ({
       ...c,
       progressPercentage: Math.min(
         Math.round((c.totalDonations / Number(c.goalAmount)) * 100),
@@ -193,7 +192,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(donations.donorId, donorId))
       .orderBy(desc(donations.createdAt));
 
-    return results.map(r => ({
+    return results.map((r) => ({
       ...r.donation,
       donor: r.donor,
       campaign: r.campaign,
@@ -220,7 +219,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(donations.campaignId, campaignId))
       .orderBy(desc(donations.createdAt));
 
-    return results.map(r => ({
+    return results.map((r) => ({
       ...r.donation,
       donor: r.donor,
       campaign: r.campaign,
@@ -252,7 +251,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(donations.createdAt))
       .limit(limit);
 
-    return results.map(r => ({
+    return results.map((r) => ({
       ...r.donation,
       donor: r.donor,
       campaign: r.campaign,
@@ -378,7 +377,7 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(campaigns, eq(fundUsage.campaignId, campaigns.id))
       .orderBy(desc(fundUsage.spentAt));
 
-    return results.map(r => ({
+    return results.map((r) => ({
       ...r.fundUsage,
       campaignName: r.campaignName,
     }));
@@ -402,7 +401,7 @@ export class DatabaseStorage implements IStorage {
     const [volunteerCount] = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(users)
-      .where(eq(users.role, 'VOLUNTEER'));
+      .where(eq(users.role, "VOLUNTEER"));
 
     const [totalRaised] = await db
       .select({
@@ -449,7 +448,7 @@ export class DatabaseStorage implements IStorage {
 
   async getVolunteerStats(volunteerId: string) {
     const now = new Date();
-    
+
     const [upcomingEvents] = await db
       .select({
         count: sql<number>`COUNT(*)`,
