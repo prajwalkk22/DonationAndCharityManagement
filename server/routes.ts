@@ -1,13 +1,13 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import { 
-  generateToken, 
-  authenticateToken, 
-  requireRole, 
-  type AuthRequest 
+
+import {
+  generateToken,
+  authenticateToken,
+  requireRole,
 } from "./middleware/auth";
+
 import {
   insertUserSchema,
   loginSchema,
