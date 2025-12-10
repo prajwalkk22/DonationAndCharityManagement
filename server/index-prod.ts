@@ -1,26 +1,23 @@
-import fs from "node:fs";
-import path from "node:path";
-import { type Server } from "node:http";
-
-import express, { type Express } from "express";
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import runApp from "./app";
 
-export async function serveStatic(app: Express, _server: Server) {
-  const distPath = path.resolve(import.meta.dirname, "../public");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
-  }
+const DIST_PATH = path.join(__dirname, "../public");
 
-  app.use(express.static(distPath));
+async function main() {
+  const app = express();
 
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  app.use(express.static(DIST_PATH));
+
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(DIST_PATH, "index.html"));
   });
+
+  await runApp((_app, _server) => {});
 }
 
-(async () => {
-  await runApp(serveStatic);
-})();
+main();
