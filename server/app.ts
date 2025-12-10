@@ -1,3 +1,4 @@
+import { pool, db } from "./db";   // <-- add db here
 import { type Server } from "node:http";
 import { storage } from "./storage";
 import express, {
@@ -40,23 +41,26 @@ app.use(express.urlencoded({ extended: false }));
 
 // ==================
 // DB HEALTH CHECK
-// ==================
 app.get("/api/health/db", async (_req, res) => {
   try {
-    const users = await storage.getAllUsers?.();
+    const queryResult = await db.execute(
+      sql`SELECT NOW() as current_time`
+    );
+    
     res.json({
       ok: true,
       connected: true,
-      userCount: users?.length ?? 0,
+      time: queryResult.rows?.[0]?.current_time,
     });
-  } catch (e: any) {
+  } catch (error:any) {
     res.status(500).json({
       ok: false,
       connected: false,
-      error: e?.message,
+      error: error.message,
     });
   }
 });
+
 
 // ==================
 // REQUEST LOGGING
