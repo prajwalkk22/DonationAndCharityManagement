@@ -1,14 +1,8 @@
-import { pool, db } from "./db";   // <-- add db here
+import { pool, db } from "./db";
+import { sql } from "drizzle-orm";   // <-- THE IMPORTANT FIX
 import { type Server } from "node:http";
 import { storage } from "./storage";
-import express, {
-  type Express,
-  type Request,
-  Response,
-  NextFunction,
-} from "express";
-import { sql } from "drizzle-orm";
-
+import express, { type Express, type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 
 export function log(message: string, source = "express") {
@@ -42,26 +36,24 @@ app.use(express.urlencoded({ extended: false }));
 
 // ==================
 // DB HEALTH CHECK
+// ==================
 app.get("/api/health/db", async (_req, res) => {
   try {
-    const queryResult = await db.execute(
-      sql`SELECT NOW() as current_time`
-    );
-    
-    res.json({
+    const result = await db.execute(sql`SELECT NOW()`);  
+
+    return res.json({
       ok: true,
       connected: true,
-      time: queryResult.rows?.[0]?.current_time,
+      time: result.rows?.[0]?.now,
     });
-  } catch (error:any) {
-    res.status(500).json({
+  } catch (error: any) {
+    return res.status(500).json({
       ok: false,
       connected: false,
       error: error.message,
     });
   }
 });
-
 
 // ==================
 // REQUEST LOGGING
@@ -104,7 +96,6 @@ export default async function runApp(
 ) {
   const server = await registerRoutes(app);
 
-  // error handling
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -112,10 +103,8 @@ export default async function runApp(
     throw err;
   });
 
-  // static serving injected here
   await setup(app, server);
 
-  // port config
   const port = parseInt(process.env.PORT || "5000", 10);
 
   server.listen(
