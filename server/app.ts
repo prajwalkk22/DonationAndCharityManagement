@@ -7,6 +7,7 @@ import express, {
   Response,
   NextFunction,
 } from "express";
+import { sql } from "drizzle-orm";
 
 import { registerRoutes } from "./routes";
 
