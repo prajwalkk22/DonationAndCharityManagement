@@ -5,6 +5,10 @@ import type { Server } from "node:http";
 
 export const app = express();
 
+// Body parsing MUST be added before routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 export function log(message: string, source = "express") {
   const formatted = new Date().toLocaleTimeString();
   console.log(`${formatted} [${source}] ${message}`);
