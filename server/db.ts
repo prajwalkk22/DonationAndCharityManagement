@@ -1,5 +1,9 @@
 import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
+
+// only load .env in dev
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -11,6 +15,7 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },   // <-- ADD THIS HERE
 });
 
 export const db = drizzle(pool, { schema });
