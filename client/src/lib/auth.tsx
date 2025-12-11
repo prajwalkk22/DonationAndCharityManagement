@@ -23,41 +23,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [, navigate] = useLocation();
 
   // Restore login state from localStorage
-  useEffect(() => {
-    async function restoreAuth() {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+useEffect(() => {
+  function restoreAuth() {
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-      if (storedToken && storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
+    if (storedToken && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
 
-          // Validate the token by calling a protected endpoint
-          const res = await fetch('/api/campaigns', {
-            headers: {
-              'Authorization': `Bearer ${storedToken}`,
-            },
-          });
-
-          if (res.ok) {
-            setToken(storedToken);
-            setUser(parsedUser);
-          } else {
-            // Token invalid → clear localStorage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-          }
-        } catch {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
+        // No API validation here — simply restore state
+        setToken(storedToken);
+        setUser(parsedUser);
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
-
-      setLoading(false);
     }
 
-    restoreAuth();
-  }, []);
+    setLoading(false);
+  }
+
+  restoreAuth();
+}, []);
+
 
   // Login function
   const login = (newUser: User, newToken: string) => {
